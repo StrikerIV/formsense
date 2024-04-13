@@ -7,8 +7,14 @@ import { AntDesign } from '@expo/vector-icons';
 import { Entypo } from '@expo/vector-icons';
 import { FontAwesome } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const Settings = ({navigation}) => {
+    const onSignOutPress = async() =>{
+        await AsyncStorage.removeItem('jwtToken');
+        navigation.navigate('Log In')
+    }
   return (
     <View style={{backgroundColor:'rgb(1,4,7)',flex:1}}>
         <SafeAreaView style={{flex:1, paddingHorizontal:25, position:'relative'}}>
@@ -56,7 +62,7 @@ const Settings = ({navigation}) => {
                 </View>
                 <AntDesign name="right" size={24} color="rgb(126,202,242)" />
             </View>
-            <Pressable onPress={()=>{navigation.navigate('Log In')}}>
+            <Pressable onPress={onSignOutPress}>
             <View style={{borderWidth:1,backgroundColor:'rgba(237,41,57,0.08)', borderColor:'#ED2939',borderRadius:10,paddingHorizontal:15,paddingVertical:13, flexDirection:'row',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
                 <View style={{flexDirection:'row', justifyContent:'center'}}>
                     <MaterialIcons style={{marginRight:10}} name="logout" size={20} color="#ED2939" />

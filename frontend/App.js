@@ -11,6 +11,10 @@ import Splash from './screens/Splash';
 import Feed from './screens/UserAccount/Feed';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
+import ServersScreen from './screens/UserAccount/ServersScreen'
+import Channels from './screens/UserAccount/Channels';
+
 
 
 
@@ -38,11 +42,18 @@ export default function App() {
       <Tab.Navigator
         screenOptions={{headerShown:false,tabBarActiveTintColor:'rgb(126,202,242)',tabBarInactiveTintColor:'rgba(126,202,242,0.5)',tabBarShowLabel:false}}
         >
-        <Stack.Screen name="Feed" component={Feed}
+        <Stack.Screen name="Servers" component={ServersScreen}
         options={({ route }) => ({
           tabBarIcon: ({ focused, color, size }) => {
             const iconName = focused ? 'home' : 'home-outline'; // Change to home when focused
             return <Ionicons name={iconName} size={size} color={color} />;
+          },
+        })} />
+          <Stack.Screen name="Create" component={Feed}
+        options={({ route }) => ({
+          tabBarIcon: ({ focused, color, size }) => {
+            const iconName = focused ? 'rgb(126,202,242)' : 'rgba(126,202,242,0.7)'; // Change to home when focused
+            return <View style={{backgroundColor:iconName, width:100, height:100, borderRadius:100, alignItems:'center', justifyContent:'center'}}><Feather name='plus' size={size*1.2} color={'white'} /></View>;
           },
         })} />
         <Stack.Screen name="Profile" component={Profile}
@@ -67,6 +78,8 @@ export default function App() {
           options={{ headerShown: false }}
         />
         <Stack.Screen name="Setting" component={Setting} options={{ headerBackVisible:false }} />
+        <Stack.Screen name="Feed" component={Feed} options={{ headerBackVisible:false }} />
+        <Stack.Screen name="Channels" component={Channels} options={{ headerBackVisible:false }} />
 
       </Stack.Navigator>
     </NavigationContainer>
