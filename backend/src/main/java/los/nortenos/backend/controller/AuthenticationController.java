@@ -1,9 +1,9 @@
 package los.nortenos.backend.controller;
 
 import jakarta.validation.Valid;
-import los.nortenos.backend.dto.EnumRole;
-import los.nortenos.backend.dto.Role;
-import los.nortenos.backend.dto.User;
+import los.nortenos.backend.dto.database.EnumRole;
+import los.nortenos.backend.dto.database.Role;
+import los.nortenos.backend.dto.database.User;
 import los.nortenos.backend.dto.payload.request.Login;
 import los.nortenos.backend.dto.payload.request.Signup;
 import los.nortenos.backend.dto.payload.response.Message;

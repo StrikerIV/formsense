@@ -1,4 +1,4 @@
-package los.nortenos.backend.dto;
+package los.nortenos.backend.dto.database;
 
 import jakarta.persistence.*;
 import lombok.Data;

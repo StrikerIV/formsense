@@ -1,7 +1,7 @@
 package los.nortenos.backend.repository;
 
-import los.nortenos.backend.dto.EnumRole;
-import los.nortenos.backend.dto.Role;
+import los.nortenos.backend.dto.database.EnumRole;
+import los.nortenos.backend.dto.database.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
