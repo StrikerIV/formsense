@@ -2,7 +2,7 @@ package los.nortenos.backend.repository;
 
 import java.util.Optional;
 
-import los.nortenos.backend.dto.User;
+import los.nortenos.backend.dto.database.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

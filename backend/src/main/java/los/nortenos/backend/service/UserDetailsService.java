@@ -1,7 +1,7 @@
 package los.nortenos.backend.service;
 
 import jakarta.transaction.Transactional;
-import los.nortenos.backend.dto.User;
+import los.nortenos.backend.dto.database.User;
 import los.nortenos.backend.repository.UserRepository;
 import los.nortenos.backend.dto.UserDetails;
 import org.springframework.beans.factory.annotation.Autowired;

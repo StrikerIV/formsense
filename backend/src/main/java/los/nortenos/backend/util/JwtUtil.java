@@ -9,6 +9,7 @@ import los.nortenos.backend.dto.UserDetails;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.WebUtils;
@@ -23,14 +24,14 @@ public class JwtUtil {
     @Value("${nortenos.app.jwtSecret}")
     private String jwtSecret;
 
-    @Value("${nortenos.app.jwtExpirationMs}")
-    private int jwtExpirationMs;
-
     @Value("${nortenos.app.jwtCookieName}")
     private String jwtCookie;
 
+    @Value("${nortenos.app.jwtExpirationMs}")
+    private int jwtExpirationMs;
+
     public String getJwtFromCookies(HttpServletRequest request) {
-        Cookie cookie = WebUtils.getCookie(request, jwtCookie);
+        Cookie cookie = WebUtils.getCookie(request, "nortenos");
         if (cookie != null) {
             return cookie.getValue();
         } else {
