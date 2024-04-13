@@ -141,6 +141,19 @@ export default function App() {
 		}
 		else {
 			console.log(motionData);
+			(async () => {
+				try {
+					const response = await fetch("http://localhost:8080/api/motion", {
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify(motionData)
+					});
+					const result = await response.json();
+					console.log(result);
+				} catch(ex) {
+					console.error(ex);
+				}
+			})();
 		}
 	}
 
