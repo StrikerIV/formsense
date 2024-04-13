@@ -34,7 +34,7 @@ const DOUBLE_TAP_DELAY = 200;
 //app
 export default function App() {
 	//state and other variables
-	const [facing, setFacing] = useState(CameraType.front);
+	const [facing, setFacing] = useState(CameraType.back);
 	const [lastTap, setLastTap] = useState(Date.now());
 
 	const [ready, setReady] = useState(false);
@@ -90,8 +90,8 @@ export default function App() {
 		const keypoints = pose
 			.filter((p) => (p.score >= CONFIDENCE))
 			.map((p) => {
-				let x = (1 - (p.x / TENSOR_WIDTH)) * SCREEN_WIDTH / RATIO,
-					y = p.y / TENSOR_HEIGHT * SCREEN_HEIGHT / RATIO;
+				let x = (1 - (p.x / TENSOR_WIDTH)) * SCREEN_WIDTH / (RATIO * 1.5),
+					y = p.y / TENSOR_HEIGHT * SCREEN_HEIGHT / (RATIO * 1.5);
 				return (<Circle key={p.name} cx={x} cy={y} r="4" strokeWidth="2" fill="#fff" stroke="#f00"></Circle>);
 			});
 		return (<Svg style={styles.svg}>{keypoints}</Svg>);
