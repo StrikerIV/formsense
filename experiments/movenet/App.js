@@ -15,6 +15,8 @@ import * as tf from "@tensorflow/tfjs";
 import * as posedetection from "@tensorflow-models/pose-detection";
 import { cameraWithTensors } from "@tensorflow/tfjs-react-native";
 
+import { embed } from "./utils.js";
+
 
 //globals
 const TensorCamera = cameraWithTensors(Camera);
@@ -39,7 +41,7 @@ export default function App() {
 
 	const [ready, setReady] = useState(false);
 	const [model, setModel] = useState(null);
-	const [pose, setPose] = useState([]);
+	const [lastPose, setLastPose] = useState([]);
 
 
 	//functions
@@ -78,23 +80,36 @@ export default function App() {
 			tf.dispose([image]);
 
 			let keypoints = poses[0].keypoints;
-			setPose(keypoints);
+			setLastPose(keypoints);
 			//console.log(keypoints);
 		}
 
 		loop();
 	}//}}}
 
-	function draw() {//{{{
+	function drawSingle(x, y, color, key) {//{{{
+		return (<Circle key={key} cx={x} cy={y} r="7" strokeWidth="3" fill="#fff" stroke={color}></Circle>);
+	}//}}}
+	function draw(pose) {//{{{
 		if(!pose) return false;
 		const keypoints = pose
 			.filter((p) => (p.score >= CONFIDENCE))
 			.map((p) => {
 				let x = (1 - (p.x / TENSOR_WIDTH)) * SCREEN_WIDTH / (RATIO * 1.5),
 					y = p.y / TENSOR_HEIGHT * SCREEN_HEIGHT / (RATIO * 1.5);
-				return (<Circle key={p.name} cx={x} cy={y} r="4" strokeWidth="2" fill="#fff" stroke="#f00"></Circle>);
+				return drawSingle(x, y, "#f00", p.name);
 			});
-		return (<Svg style={styles.svg}>{keypoints}</Svg>);
+		const normed = embed(pose);
+		const ided = normed
+			? normed
+				.filter((p) => (p.score >= CONFIDENCE))
+				.map((p) => {
+					let x = -p.x * 200 + 0.5 * SCREEN_WIDTH,
+						y = p.y * 200 + 0.5 * SCREEN_HEIGHT;
+					return drawSingle(x, y, "#00f", p.name);
+				})
+			: false;
+		return (<Svg style={styles.svg}>{keypoints}{ided}</Svg>);
 	}//}}}
 
 	function toggleFacing() {//{{{
@@ -135,7 +150,7 @@ export default function App() {
 					resizeHeight={TENSOR_HEIGHT}
 					resizeDepth={3}>
 				</TensorCamera>
-				{draw()}
+				{draw(lastPose)}
 			</Pressable>
 		</View>);
 	}
