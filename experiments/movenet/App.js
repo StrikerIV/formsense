@@ -102,15 +102,12 @@ export default function App() {
 		console.log("flip");
 	}//}}}
 	function tap() {//{{{
-		toggleFacing();
-		/*
 		let now = Date.now();
 		if(now - lastTap <= DOUBLE_TAP_DELAY) {
 			//doubletap
 			toggleFacing();
 		}
 		setLastTap(now);
-		*/
 	}//}}}
 
 
