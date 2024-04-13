@@ -96,12 +96,15 @@ export default function App() {
 		console.log("flip");
 	}//}}}
 	function tap() {//{{{
+		toggleFacing();
+		/*
 		let now = Date.now();
 		if(now - lastTap <= DOUBLE_TAP_DELAY) {
 			//doubletap
 			toggleFacing();
 		}
 		setLastTap(now);
+		*/
 	}//}}}
 
 
@@ -118,15 +121,16 @@ export default function App() {
 	//{{{
 	if(ready) {
 		return (<View style={styles.container}>
-			<TensorCamera style={styles.camera}
-				type={facing}
-				onReady={detectPose}
-				resizeWidth={IMAGE_WIDTH}
-				resizeHeight={IMAGE_HEIGHT}
-				resizeDepth={3}>
-				<Pressable style={styles.flipper} onPress={tap}></Pressable>
-			</TensorCamera>
-			{draw()}
+			<Pressable style={styles.flipper} onPress={tap}>
+				<TensorCamera style={styles.camera}
+					type={facing}
+					onReady={detectPose}
+					resizeWidth={IMAGE_WIDTH}
+					resizeHeight={IMAGE_HEIGHT}
+					resizeDepth={3}>
+				</TensorCamera>
+				{draw()}
+			</Pressable>
 		</View>);
 	}
 	else {
@@ -142,7 +146,8 @@ const styles = StyleSheet.create({//{{{
 		flex: 1
 	},
 	camera: {
-		flex: 1
+		flex: 1,
+		aspectRatio: RATIO
 	},
 	svg: {
 		width: "100%",
