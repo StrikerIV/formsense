@@ -72,26 +72,4 @@ public class ServerController {
     public Server getServer(@PathVariable long uid) {
         return serverRepository.findById(uid).orElse(null);
     }
-
-    @Transactional
-    @PostMapping("/{uid}/channels")
-    public ResponseEntity<?> addChannelToServer(@PathVariable long uid,
-                                                @Valid @RequestBody ChannelBody channelBody) {
-        if(channelRepository.existsByName(channelBody.getName())) {
-            return ResponseEntity.badRequest().body(new
-                    Message("Error: A channel by this name already exists."));
-        }
-
-        Server server = serverRepository.getReferenceById(uid);
-
-        Channel channel = new Channel();
-        channel.setName(channelBody.getName());
-        channel.setDescription(channelBody.getDescription());
-
-        server.getChannels().add(channel);
-
-        Channel savedChannel = channelRepository.save(channel);
-
-        return ResponseEntity.ok(savedChannel.getUid().toString());
-    }
 }
