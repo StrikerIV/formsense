@@ -15,6 +15,8 @@ import * as tf from "@tensorflow/tfjs";
 import * as posedetection from "@tensorflow-models/pose-detection";
 import { cameraWithTensors } from "@tensorflow/tfjs-react-native";
 
+import { embed } from "./utils.js";
+
 
 //globals
 const TensorCamera = cameraWithTensors(Camera);
@@ -28,18 +30,19 @@ const TENSOR_WIDTH = 120;
 const TENSOR_HEIGHT = TENSOR_WIDTH / RATIO;
 const CONFIDENCE = 0.3;
 
-const DOUBLE_TAP_DELAY = 200;
+var motionData = [];
 
 
 //app
 export default function App() {
 	//state and other variables
 	const [facing, setFacing] = useState(CameraType.back);
-	const [lastTap, setLastTap] = useState(Date.now());
 
 	const [ready, setReady] = useState(false);
 	const [model, setModel] = useState(null);
-	const [pose, setPose] = useState([]);
+	const [lastPose, setLastPose] = useState([]);
+
+	const [recording, setRecording] = useState(false);
 
 
 	//functions
@@ -78,37 +81,81 @@ export default function App() {
 			tf.dispose([image]);
 
 			let keypoints = poses[0].keypoints;
-			setPose(keypoints);
+			setLastPose(keypoints);
 			//console.log(keypoints);
 		}
 
 		loop();
 	}//}}}
 
-	function draw() {//{{{
+	function drawSingle(x, y, color, key) {//{{{
+		return (<Circle key={key} cx={x} cy={y} r="7" strokeWidth="3" fill="#fff" stroke={color}></Circle>);
+	}//}}}
+	function draw(pose) {//{{{
 		if(!pose) return false;
+
+		//un-norm'ed
 		const keypoints = pose
 			.filter((p) => (p.score >= CONFIDENCE))
 			.map((p) => {
 				let x = (1 - (p.x / TENSOR_WIDTH)) * SCREEN_WIDTH / (RATIO * 1.5),
 					y = p.y / TENSOR_HEIGHT * SCREEN_HEIGHT / (RATIO * 1.5);
-				return (<Circle key={p.name} cx={x} cy={y} r="4" strokeWidth="2" fill="#fff" stroke="#f00"></Circle>);
+				return drawSingle(x, y, "#f00", p.name);
 			});
-		return (<Svg style={styles.svg}>{keypoints}</Svg>);
+
+		//norm'ed
+		const normed = embed(pose);
+		const ided = normed
+			? normed
+				.filter((p) => (p.score >= CONFIDENCE))
+				.map((p) => {
+					let x = -p.x * 200 + 0.5 * SCREEN_WIDTH,
+						y = p.y * 200 + 0.5 * SCREEN_HEIGHT;
+					return drawSingle(x, y, "#00f", p.name);
+				})
+			: false;
+
+		//recording part (FIXME move somewhere else)
+		if(recording) {
+			motionData.push(normed);
+		}
+
+		//playback part
+		//
+
+		//return draw element
+		return (<Svg style={styles.svg}>{keypoints}{ided}</Svg>);
 	}//}}}
 
 	function toggleFacing() {//{{{
 		setFacing(facing == CameraType.front ? CameraType.back : CameraType.front);
 		console.log("flip");
 	}//}}}
-	function tap() {//{{{
-		let now = Date.now();
-		if(now - lastTap <= DOUBLE_TAP_DELAY) {
-			//doubletap
-			toggleFacing();
+
+	function record() {
+		let newValue = !recording;
+		console.log("NOW", newValue ? "RECORDING" : "IDLING");
+		setRecording(newValue);
+		if(newValue) {
+			motionData = [];
 		}
-		setLastTap(now);
-	}//}}}
+		else {
+			console.log(motionData);
+			(async () => {
+				try {
+					const response = await fetch("http://localhost:8080/api/motion", {
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify(motionData)
+					});
+					const result = await response.json();
+					console.log(result);
+				} catch(ex) {
+					console.error(ex);
+				}
+			})();
+		}
+	}
 
 
 	//init
@@ -124,7 +171,7 @@ export default function App() {
 	//{{{
 	if(ready) {
 		return (<View style={styles.container}>
-			<Pressable style={styles.flipper} onPress={tap}>
+			<View style={styles.top}>
 				<TensorCamera style={styles.camera}
 					type={facing}
 					onReady={detectPose}
@@ -132,8 +179,16 @@ export default function App() {
 					resizeHeight={TENSOR_HEIGHT}
 					resizeDepth={3}>
 				</TensorCamera>
-				{draw()}
-			</Pressable>
+				{draw(lastPose)}
+			</View>
+			<View style={styles.bottom}>
+				<Pressable style={styles.flipper} onPress={toggleFacing}>
+					<Text> Flip to { facing == "front" ? "Back" : "Front" } </Text>
+				</Pressable>
+				<Pressable style={styles.record} onPress={record}>
+					<Text> { recording ? "Stop Recording" : "Start Recording" } </Text>
+				</Pressable>
+			</View>
 		</View>);
 	}
 	else {
@@ -148,6 +203,13 @@ const styles = StyleSheet.create({//{{{
 	container: {
 		flex: 1
 	},
+	top: {
+		flex: 8
+	},
+	bottom: {
+		flex: 2,
+		flexDirection: "row"
+	},
 	camera: {
 		flex: 1,
 		aspectRatio: RATIO
@@ -159,7 +221,14 @@ const styles = StyleSheet.create({//{{{
 		zIndex: 100
 	},
 	flipper: {
-		flex: 1
+		flex: 1,
+		justifyContent: "center",
+		alignItems: "center"
+	},
+	record: {
+		flex: 1,
+		justifyContent: "center",
+		alignItems: "center"
 	},
 	loading: {
 		flex: 1,

@@ -65,6 +65,7 @@ let getPose = (x) => (x["pose"]["keypoints"].map(getXY));
 posenet.on("pose", (results) => {
 	if(results.length == 0 || results[0]["skeleton"].length == 0) return;
 
+	console.log(results);
 	poses = results.map(getPose);
 	//skeleton = results[0]["skeleton"][0].map(getXY);
 });
