@@ -1,0 +1,16 @@
+local:
+- user stats
+- rep tracker
+- learn motion
+- motion library?
+- settings?
+
+
+community:
+- browse groups not in
+- list of groups in
+- (under a group) list of categories
+- (under a category) list of posts
+- (under a post) list of comments
+- other user profile page
+
