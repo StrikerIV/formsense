@@ -1,5 +1,5 @@
-let pose = [],
-	skeleton = [];
+let poses = [],
+	skeletons = [];
 let size = 8;
 
 
@@ -20,14 +20,16 @@ function draw() {
 	ctx.drawImage(video, 0, 0, c.width, c.height);
 
 	//skeleton and pose
-	ctx.fillStyle = "#00f";
-	for(let [x, y] of skeleton) {
-		ctx.fillRect(x - 0.5 * size, y - 0.5 * size, size, size);
-	}
+	//ctx.fillStyle = "#00f";
+	//for(let [x, y] of skeleton) {
+	//	ctx.fillRect(x - 0.5 * size, y - 0.5 * size, size, size);
+	//}
 
 	ctx.fillStyle = "#ff8000";
-	for(let [x, y] of pose) {
-		ctx.fillRect(x - 0.5 * size, y - 0.5 * size, size, size);
+	for(let pose of poses) {
+		for(let [x, y] of pose) {
+			ctx.fillRect(x - 0.5 * size, y - 0.5 * size, size, size);
+		}
 	}
 }
 video.addEventListener("play", draw);
@@ -51,18 +53,20 @@ navigator.mediaDevices
 const posenet = ml5.poseNet(
 	video,
 	{
-		detectionType: "single"
+		detectionType: "multiple"
 	},
 	() => {
 		console.log("posenet loaded");
 	});
 
-let getXY = (x) => ([x["position"]["x"], x["position"]["y"]]);
+//~	JANK 1.3!!!
+let getXY = (x) => ([x["position"]["x"] * 1.3, x["position"]["y"]]);
+let getPose = (x) => (x["pose"]["keypoints"].map(getXY));
 posenet.on("pose", (results) => {
 	if(results.length == 0 || results[0]["skeleton"].length == 0) return;
 
-	pose = results[0]["pose"]["keypoints"].map(getXY);
-	skeleton = results[0]["skeleton"][0].map(getXY);
+	poses = results.map(getPose);
+	//skeleton = results[0]["skeleton"][0].map(getXY);
 });
 
 
