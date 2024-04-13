@@ -30,18 +30,19 @@ const TENSOR_WIDTH = 120;
 const TENSOR_HEIGHT = TENSOR_WIDTH / RATIO;
 const CONFIDENCE = 0.3;
 
-const DOUBLE_TAP_DELAY = 200;
+var motionData = [];
 
 
 //app
 export default function App() {
 	//state and other variables
 	const [facing, setFacing] = useState(CameraType.back);
-	const [lastTap, setLastTap] = useState(Date.now());
 
 	const [ready, setReady] = useState(false);
 	const [model, setModel] = useState(null);
 	const [lastPose, setLastPose] = useState([]);
+
+	const [recording, setRecording] = useState(false);
 
 
 	//functions
@@ -92,6 +93,8 @@ export default function App() {
 	}//}}}
 	function draw(pose) {//{{{
 		if(!pose) return false;
+
+		//un-norm'ed
 		const keypoints = pose
 			.filter((p) => (p.score >= CONFIDENCE))
 			.map((p) => {
@@ -99,6 +102,8 @@ export default function App() {
 					y = p.y / TENSOR_HEIGHT * SCREEN_HEIGHT / (RATIO * 1.5);
 				return drawSingle(x, y, "#f00", p.name);
 			});
+
+		//norm'ed
 		const normed = embed(pose);
 		const ided = normed
 			? normed
@@ -109,6 +114,16 @@ export default function App() {
 					return drawSingle(x, y, "#00f", p.name);
 				})
 			: false;
+
+		//recording part (FIXME move somewhere else)
+		if(recording) {
+			motionData.push(normed);
+		}
+
+		//playback part
+		//
+
+		//return draw element
 		return (<Svg style={styles.svg}>{keypoints}{ided}</Svg>);
 	}//}}}
 
@@ -116,17 +131,18 @@ export default function App() {
 		setFacing(facing == CameraType.front ? CameraType.back : CameraType.front);
 		console.log("flip");
 	}//}}}
-	function tap() {//{{{
-		toggleFacing();
-		/*
-		let now = Date.now();
-		if(now - lastTap <= DOUBLE_TAP_DELAY) {
-			//doubletap
-			toggleFacing();
+
+	function record() {
+		let newValue = !recording;
+		console.log("NOW", newValue ? "RECORDING" : "IDLING");
+		setRecording(newValue);
+		if(newValue) {
+			motionData = [];
 		}
-		setLastTap(now);
-		*/
-	}//}}}
+		else {
+			console.log(motionData);
+		}
+	}
 
 
 	//init
@@ -142,7 +158,7 @@ export default function App() {
 	//{{{
 	if(ready) {
 		return (<View style={styles.container}>
-			<Pressable style={styles.flipper} onPress={tap}>
+			<View style={styles.top}>
 				<TensorCamera style={styles.camera}
 					type={facing}
 					onReady={detectPose}
@@ -151,7 +167,15 @@ export default function App() {
 					resizeDepth={3}>
 				</TensorCamera>
 				{draw(lastPose)}
-			</Pressable>
+			</View>
+			<View style={styles.bottom}>
+				<Pressable style={styles.flipper} onPress={toggleFacing}>
+					<Text> Flip to { facing == "front" ? "Back" : "Front" } </Text>
+				</Pressable>
+				<Pressable style={styles.record} onPress={record}>
+					<Text> { recording ? "Stop Recording" : "Start Recording" } </Text>
+				</Pressable>
+			</View>
 		</View>);
 	}
 	else {
@@ -166,6 +190,13 @@ const styles = StyleSheet.create({//{{{
 	container: {
 		flex: 1
 	},
+	top: {
+		flex: 8
+	},
+	bottom: {
+		flex: 2,
+		flexDirection: "row"
+	},
 	camera: {
 		flex: 1,
 		aspectRatio: RATIO
@@ -177,7 +208,14 @@ const styles = StyleSheet.create({//{{{
 		zIndex: 100
 	},
 	flipper: {
-		flex: 1
+		flex: 1,
+		justifyContent: "center",
+		alignItems: "center"
+	},
+	record: {
+		flex: 1,
+		justifyContent: "center",
+		alignItems: "center"
 	},
 	loading: {
 		flex: 1,
