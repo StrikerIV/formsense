@@ -1,11 +1,14 @@
 //https://github.com/tensorflow/tfjs-examples/blob/master/react-native/pose-detection/App.tsx
 //https://docs.expo.dev/versions/latest/sdk/camera/
 //https://github.com/tensorflow/tfjs-models/tree/master/pose-detection
+//https://js.tensorflow.org/api_react_native/0.2.1/#cameraWithTensors
+//https://github.com/tensorflow/tfjs-models/blob/master/pose-detection/src/create_detector.ts
+//https://github.com/tensorflow/tfjs-models/blob/master/pose-detection/src/movenet/detector.ts
 
 //imports
 import { Camera, CameraType } from "expo-camera";
 import { useEffect, useState } from "react";
-import { Button, Dimensions, Pressable, StyleSheet, Text, View } from "react-native";
+import { Button, Dimensions, Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import Svg, { Circle } from "react-native-svg";
 
 import * as tf from "@tensorflow/tfjs";
@@ -15,12 +18,15 @@ import { cameraWithTensors } from "@tensorflow/tfjs-react-native";
 
 //globals
 const TensorCamera = cameraWithTensors(Camera);
-const RATIO = 3 / 4;
-const CAMERA_WIDTH = Dimensions.get("window").width;
-const CAMERA_HEIGHT = CAMERA_WIDTH / RATIO;
-const IMAGE_WIDTH = 180;
-const IMAGE_HEIGHT = IMAGE_WIDTH / RATIO;
-const CONFIDENCE = 0.1;
+
+const IS_ANDROID = Platform.OS == "android";
+
+const RATIO = IS_ANDROID ? 3 / 4 : 9 / 16;
+const SCREEN_WIDTH = Dimensions.get("window").width;
+const SCREEN_HEIGHT = SCREEN_WIDTH / RATIO;
+const TENSOR_WIDTH = 120;
+const TENSOR_HEIGHT = TENSOR_WIDTH / RATIO;
+const CONFIDENCE = 0.3;
 
 const DOUBLE_TAP_DELAY = 200;
 
@@ -84,8 +90,8 @@ export default function App() {
 		const keypoints = pose
 			.filter((p) => (p.score >= CONFIDENCE))
 			.map((p) => {
-				let x = (1 - (p.x / IMAGE_WIDTH)) * CAMERA_WIDTH,
-					y = p.y / IMAGE_HEIGHT * CAMERA_HEIGHT;
+				let x = (1 - (p.x / TENSOR_WIDTH)) * SCREEN_WIDTH / RATIO,
+					y = p.y / TENSOR_HEIGHT * SCREEN_HEIGHT / RATIO;
 				return (<Circle key={p.name} cx={x} cy={y} r="4" strokeWidth="2" fill="#fff" stroke="#f00"></Circle>);
 			});
 		return (<Svg style={styles.svg}>{keypoints}</Svg>);
@@ -125,8 +131,8 @@ export default function App() {
 				<TensorCamera style={styles.camera}
 					type={facing}
 					onReady={detectPose}
-					resizeWidth={IMAGE_WIDTH}
-					resizeHeight={IMAGE_HEIGHT}
+					resizeWidth={TENSOR_WIDTH}
+					resizeHeight={TENSOR_HEIGHT}
 					resizeDepth={3}>
 				</TensorCamera>
 				{draw()}
