@@ -56,15 +56,15 @@ const SignUpScreen = ({navigation}) => {
         
         {/**Submit Button*/}
         <TouchableOpacity
-        onPress={()=>{navigation.navigate('Sign Up')}}style={{borderWidth:1,backgroundColor:'rgba(126,202,242,0.12)', borderColor:'rgb(126,202,242)',borderRadius:10,paddingHorizontal:15,paddingVertical:15, alignItems:'center', justifyContent:'center'}}>
+        onPress={()=>{navigation.navigate('Log In')}}style={{borderWidth:1,backgroundColor:'rgba(126,202,242,0.12)', borderColor:'rgb(126,202,242)',borderRadius:10,paddingHorizontal:15,paddingVertical:15, alignItems:'center', justifyContent:'center'}}>
             <Text style={{color:'white', fontFamily:'LexendDeca-Regular'}}>Create Account</Text>
         </TouchableOpacity>
         </View>
 
         <View style={{flexDirection:'row', justifyContent:'center'}}>
-            <Text style={{color:'white', fontFamily:'LexendDeca-Thin', fontSize:16}}>Have an account? </Text>
-            <Pressable><Text style={{color:'rgb(126,202,242)', fontFamily:'LexendDeca-Thin', fontSize:16}}>Log In Now</Text></Pressable>
-        </View>
+                <Text style={{color:'white', fontFamily:'LexendDeca-Regular', fontSize:16}}>Have an account? </Text>
+                <Pressable onPress={()=>{navigation.navigate('Log In')}}><Text style={{color:'rgb(126,202,242)', fontFamily:'LexendDeca-Regular', fontSize:16}}>Log In</Text></Pressable>
+            </View>
         
     </SafeAreaView>
 

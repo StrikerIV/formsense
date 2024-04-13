@@ -1,14 +1,23 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { Settings, StyleSheet, Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import SignInScreen from './screens/SignInScreen';
 import SignUpScreen from './screens/SignUpScreen';
+import Profile from './screens/UserAccount/Profile';
+import Setting from './screens/UserAccount/Settings';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useFonts } from 'expo-font';
+import Splash from './screens/Splash';
+import Feed from './screens/UserAccount/Feed';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Ionicons } from '@expo/vector-icons';
 
 
 
 const Stack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
+
+
 export default function App() {
   const [fontsLoaded] = useFonts({
     'LexendDeca-Black': require('./assets/fonts/LexendDeca-Black.ttf'),
@@ -20,19 +29,45 @@ export default function App() {
     'LexendDeca-Medium': require('./assets/fonts/LexendDeca-Medium.ttf'),
     'LexendDeca-SemiBold': require('./assets/fonts/LexendDeca-SemiBold.ttf'),
     'LexendDeca-Thin': require('./assets/fonts/LexendDeca-Thin.ttf'),
-
-
-
-
   });
   if (!fontsLoaded) {
     return null;
   }
+  function MyTabs() {
+    return (
+      <Tab.Navigator
+        screenOptions={{headerShown:false,tabBarActiveTintColor:'rgb(126,202,242)',tabBarInactiveTintColor:'rgba(126,202,242,0.5)',tabBarShowLabel:false}}
+        >
+        <Stack.Screen name="Feed" component={Feed}
+        options={({ route }) => ({
+          tabBarIcon: ({ focused, color, size }) => {
+            const iconName = focused ? 'home' : 'home-outline'; // Change to home when focused
+            return <Ionicons name={iconName} size={size} color={color} />;
+          },
+        })} />
+        <Stack.Screen name="Profile" component={Profile}
+        options={{
+      tabBarIcon: ({ focused, color, size }) => {
+        const iconName = focused ? 'person' : 'person-outline'; // Change to person when focused
+        return <Ionicons name={iconName} size={size} color={color} />;
+      },
+    }} />
+      </Tab.Navigator>
+    );
+  }
   return (
-    <NavigationContainer style={styles.container}>
-      <Stack.Navigator screenOptions={{headerShown:false}}>
-        <Stack.Screen name="Log In" component={SignInScreen} />
+    <NavigationContainer style={styles.container}  theme={{ colors: { background: 'rgba(1,1,1,0.9)' } }}>
+      <Stack.Navigator initialRouteName="Splash" screenOptions={{headerShown:false,backgroundColor:'black'}}>
+        <Stack.Screen name="Splash" component={Splash} />
         <Stack.Screen name="Sign Up" component={SignUpScreen} />
+        <Stack.Screen name="Log In" component={SignInScreen} />
+        <Stack.Screen
+          name="In App"
+          component={MyTabs}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen name="Setting" component={Setting} options={{ headerBackVisible:false }} />
+
       </Stack.Navigator>
     </NavigationContainer>
   );
