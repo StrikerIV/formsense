@@ -1,0 +1,53 @@
+user:
+- id
+- username
+- email
+- pass or whatever
+- name
+- bio?
+- profile picture
+- age
+- weight
+- height
+- stats (dictionary)
+- list of groups in?
+
+
+group (server):
+- id
+- name
+- desc
+- icon
+- list of categories
+- list of users?
+
+
+category (channel):
+- id
+- what group it's in?
+- name
+- desc
+- icon
+- list of posts
+
+
+post:
+- id
+- what category it's under
+- title
+- desc
+- image, motion
+- datetime
+- poster (user)
+- rating
+- list of comments
+
+
+comment:
+- id
+- post it's under?
+- message
+- datetime
+- commenter (user)
+- rating
+
