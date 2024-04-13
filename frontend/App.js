@@ -14,6 +14,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
 import ServersScreen from './screens/UserAccount/ServersScreen'
 import Channels from './screens/UserAccount/Channels';
+import Create from './screens/UserAccount/Create';
 
 
 
@@ -80,6 +81,9 @@ export default function App() {
         <Stack.Screen name="Setting" component={Setting} options={{ headerBackVisible:false }} />
         <Stack.Screen name="Feed" component={Feed} options={{ headerBackVisible:false }} />
         <Stack.Screen name="Channels" component={Channels} options={{ headerBackVisible:false }} />
+        <Stack.Screen name="Create" component={Create} options={{ headerBackVisible:false }} />
+
+        
 
       </Stack.Navigator>
     </NavigationContainer>
